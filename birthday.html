@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>Birthday Surprise</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Parisienne&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;background:#000;font-family:'Parisienne'}
+
+/* ---------------- BACKGROUND ---------------- */
+#scene{
+  position:relative;width:100vw;height:100vh;
+  overflow:hidden;transition:1.2s ease-in-out;
+}
+.bg-wrapper{position:absolute;inset:0;overflow:hidden;}
+
+#bg{
+  position:absolute;top:50%;left:50%;
+  width:110%;height:auto;opacity:0;
+  transform:translate(-50%,-50%);
+  object-fit:cover;
+  animation:bgFade 3s ease-out forwards, bgZoom 4s ease-out forwards;
+}
+@keyframes bgFade{
+  0%{opacity:0;filter:brightness(1.6)}
+  60%{opacity:.95;filter:brightness(1.25)}
+  100%{opacity:1;filter:brightness(1.12)}
+}
+@keyframes bgZoom{
+  0%{transform:translate(-50%,-50%) scale(1)}
+  100%{transform:translate(-50%,-50%) scale(1.08)}
+}
+
+.white-haze{
+  position:absolute;inset:0;
+  background:rgba(255,255,255,.75);
+  opacity:0;animation:hazeIn 3s forwards;
+}
+@keyframes hazeIn{
+  0%{opacity:0}60%{opacity:.85}100%{opacity:.75}
+}
+
+.grain{
+  position:absolute;inset:0;
+  background:url("grain.png");
+  mix-blend-mode:overlay;
+  opacity:.32;
+  animation:grainPulse 4s infinite alternate;
+}
+@keyframes grainPulse{0%{opacity:.18}100%{opacity:.42}}
+
+/* ---------------- Hearts ---------------- */
+#hearts{position:fixed;inset:0;pointer-events:none;z-index:500;}
+
+.heart-fill,.heart-outline{
+  position:absolute;font-size:2.2rem;
+  animation-duration:7s;animation-fill-mode:forwards;
+}
+.heart-fill{
+  color:#ff7da8;text-shadow:0 0 14px #ff7da8;
+  animation-name:heartFloat;
+}
+.heart-outline{
+  color:#ff7da8;text-shadow:0 0 8px #ff7da8;
+  animation-name:heartDrawFloat;
+}
+
+@keyframes heartFloat{
+  0%{opacity:0;transform:translateY(0) scale(.7)}
+  20%{opacity:1}
+  100%{opacity:0;transform:translateY(-260px) scale(1.2)}
+}
+@keyframes heartDrawFloat{
+  0%{opacity:0;transform:scale(.1) translateY(0);filter:blur(4px)}
+  20%{opacity:1;transform:scale(1) translateY(-20px);filter:blur(0)}
+  100%{opacity:0;transform:scale(1.25) translateY(-240px);filter:blur(2px)}
+}
+
+.big-heart{
+  position:absolute;font-size:4rem;color:#ff7da8;
+  text-shadow:0 0 18px rgba(255,125,168,.9);
+  animation:bigHeartDraw 5s ease-out forwards;
+}
+@keyframes bigHeartDraw{
+  0%{opacity:0;transform:scale(.1) translate(-50%,-50%)}
+  20%{opacity:1;transform:scale(1.1) translate(-50%,-52%)}
+  60%{opacity:1;transform:scale(1) translate(-50%,-60%)}
+  100%{opacity:0;transform:scale(1.3) translate(-50%,-80%)}
+}
+
+/* ---------------- CALENDAR ---------------- */
+#calendar{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(1.2);
+  background:#fff;padding:22px;border-radius:16px;
+  opacity:0;box-shadow:0 20px 60px rgba(0,0,0,.35);
+  animation:calIn 1.7s 4s forwards,calOut .7s 7.2s forwards;
+}
+@keyframes calIn{
+  0%{opacity:0;transform:translate(-50%,-55%) scale(1.25)}
+  100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+}
+@keyframes calOut{
+  0%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-60%) scale(1.1)}
+}
+
+#calendar table{width:100%;font-size:1.4rem;margin-top:10px}
+#calendar td,#calendar th{padding:6px}
+
+#click-circle{
+  position:absolute;width:26px;height:26px;
+  border:3px solid #ff6fa2;border-radius:50%;
+  opacity:0;transition:.3s;z-index:999;
+}
+#arrow{
+  position:absolute;font-size:2.4rem;color:#ff6fa2;
+  opacity:0;transition:.3s;z-index:1000;
+}
+
+/* ---------------- POLAROIDS ---------------- */
+.polaroid,.polaroid-two{
+  position:absolute;width:300px;height:350px;padding:14px;
+  background:#fff;border-radius:12px;
+  opacity:0;transform:translateY(40px) scale(1.05);
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+  animation:polIn 1.5s 7.5s forwards,
+           polGlow 1.4s 9s forwards,
+           polFloat 8s 9s infinite alternate;
+}
+.polaroid{left:40px;bottom:40px;}
+.polaroid-two{right:40px;top:40px;}
+
+@keyframes polIn{
+  from{opacity:0;transform:translateY(40px) scale(1.1)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes polGlow{
+  from{box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  to{box-shadow:0 20px 80px rgba(255,120,170,.8)}
+}
+@keyframes polFloat{
+  0%{transform:translateY(0) rotate(-2deg)}
+  50%{transform:translateY(-14px) rotate(1deg)}
+  100%{transform:translateY(0) rotate(-2deg)}
+}
+
+.polaroid-img{
+  width:100%;height:100%;object-fit:cover;border-radius:8px;
+}
+
+/* ---------------- TEXT ---------------- */
+#birthday-text{
+  position:absolute;
+  top:35%;left:30%;
+  transform:translate(-50%,-50%);
+}
+#t1{
+  font-family:'Great Vibes';font-size:3rem;opacity:0;
+}
+#t2{
+  font-family:'Parisienne';font-size:2.3rem;opacity:0;
+}
+
+/* ---------------- VIDEO ---------------- */
+#video-section{
+  position:fixed;inset:0;background:#000;
+  opacity:0;pointer-events:none;
+  transition:1s;z-index:300000;
+}
+#birthday-video{
+  width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:1s;
+}
+
+/* ---------------- AFTER VIDEO ENVELOPE ---------------- */
+#after-video{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:.8s;z-index:350000;
+}
+
+#after-inner{
+  display:flex;gap:60px;
+  align-items:center;justify-content:center;
+}
+
+#envelope{
+  position:relative;width:320px;height:220px;
+  transform:translateY(40px) scale(1.2);
+  opacity:0;cursor:pointer;transition:.8s;
+}
+#envelope.show{opacity:1;transform:translateY(0) scale(1.2);}
+
+#envelope-body{
+  position:absolute;inset:40px 0 0 0;
+  height:160px;background:#f8f1df;
+  border-radius:10px;box-shadow:0 14px 35px rgba(0,0,0,.25);
+}
+
+#envelope-flap{
+  position:absolute;top:0;left:0;right:0;
+  height:130px;
+  background:linear-gradient(to bottom,#f9f3e4,#f2e7d0);
+  clip-path:polygon(0 0,100% 0,50% 60%);
+  border-radius:8px 8px 0 0;
+  transform-origin:top;transition:.5s;
+}
+
+#envelope-seal-heart{
+  position:absolute;top:60px;left:50%;
+  transform:translateX(-50%);
+  font-size:1.8rem;color:#ff7da8;
+}
+
+#envelope-letter-preview{
+  position:absolute;left:20px;right:20px;bottom:20px;
+  height:100px;background:#fffdf7;border-radius:6px;
+}
+
+#envelope-label{
+  position:absolute;bottom:-34px;left:50%;
+  transform:translateX(-50%);
+  color:#fff;font-size:1.1rem;text-shadow:0 0 8px #000;
+}
+
+#envelope.opened #envelope-flap{
+  transform:rotateX(160deg);
+}
+
+/* ---------------- LETTER + MUSIC ---------------- */
+#letter-card{
+  display:flex;gap:40px;
+  opacity:0;transform:translateY(30px) scale(1.2);
+  transition:.8s;
+}
+
+.letter-paper{
+  background:#fdf7ec;padding:28px 32px;
+  min-width:300px;max-width:360px;
+  border-radius:12px;
+  box-shadow:0 16px 40px rgba(0,0,0,.25);
+}
+
+/* SIMPLE HEADING */
+.letter-paper h2{
+  font-family:'Georgia',serif;
+  font-size:1.9rem;font-weight:600;
+  text-align:center;color:#333;
+  letter-spacing:.5px;margin-bottom:10px;
+}
+
+.letter-paper p{
+  font-size:1.1rem;line-height:1.7;
+}
+
+.music-card{
+  background:#f8f1df;padding:20px;
+  width:260px;border-radius:16px;
+  box-shadow:0 16px 40px rgba(0,0,0,.25);
+}
+.music-header{
+  display:flex;gap:12px;align-items:center;
+}
+.music-cover{
+  width:60px;height:60px;border-radius:12px;
+  background:linear-gradient(135deg,#ff8fb8,#ffc6dd);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;
+}
+.music-title{
+  font-size:1.1rem;font-weight:600;
+}
+
+#play-snippet{
+  margin-top:10px;background:#ff7da8;
+  color:#fff;border:none;padding:8px 20px;
+  border-radius:50px;cursor:pointer;
+}
+
+/* CLOSE BUTTON */
+#close-btn{
+  position:fixed;bottom:20px;left:50%;
+  transform:translateX(-50%);
+  padding:12px 26px;background:#fff;
+  border:none;border-radius:24px;cursor:pointer;
+  opacity:0;transition:.5s;z-index:1000000;
+}
+#close-btn.show{opacity:1}
+
+#fadeout{
+  position:fixed;inset:0;background:#fff;
+  opacity:0;transition:1.2s;pointer-events:none;
+  z-index:10000000;
+}
+</style>
+</head>
+
+<body>
+
+<div id="fadeout"></div>
+
+<div id="intro" style="
+  position:fixed;inset:0;background:white;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.4rem;font-family:'Great Vibes';
+  cursor:pointer;z-index:9999;">
+  Tap to Start 💖
+</div>
+
+<audio id="bgmusic">
+  <source src="WhatsApp Audio 2025-12-03 at 11.36.36_751890ee.mp3">
+</audio>
+
+<audio id="snippetAudio">
+  <source src="WhatsApp Audio 2025-12-03 at 11.36.36_751890ee.mp3">
+</audio>
+
+<div id="scene">
+
+  <div class="bg-wrapper">
+    <img id="bg" src="WhatsApp Image 2025-12-03 at 00.46.22_b52bf4b9.jpg">
+    <div class="white-haze"></div>
+    <div class="grain"></div>
+  </div>
+
+  <div id="hearts"></div>
+
+  <div id="calendar">
+    <h2>December</h2>
+    <table>
+      <tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr>
+      <tr>
+        <td></td><td>1</td><td>2</td><td>3</td>
+        <td>4</td><td id="fifth">5</td><td>6</td>
+      </tr>
+      <tr>
+        <td>7</td><td>8</td><td>9</td>
+        <td>10</td><td>11</td><td>12</td><td>13</td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="click-circle"></div>
+  <div id="arrow">➤</div>
+
+  <div class="polaroid">
+    <img class="polaroid-img" src="WhatsApp Image 2025-12-03 at 23.12.10_c2a69d14.jpg">
+  </div>
+
+  <div class="polaroid-two">
+    <img class="polaroid-img" src="WhatsApp Image 2025-12-03 at 23.12.09_94d22cba.jpg">
+  </div>
+
+  <div id="birthday-text">
+    <div id="t1"></div>
+    <div id="t2">Happy 21st birthday babe</div>
+  </div>
+
+</div>
+
+<div id="video-section">
+  <video id="birthday-video" playsinline preload="auto">
+    <source src="WhatsApp Video 2025-12-04 at 21.38.45_8e222329.mp4" type="video/mp4">
+  </video>
+</div>
+
+<div id="after-video">
+  <div id="after-inner">
+
+    <div id="envelope">
+      <div id="envelope-body"></div>
+      <div id="envelope-letter-preview"></div>
+      <div id="envelope-flap"></div>
+      <div id="envelope-seal-heart">❤</div>
+      <div id="envelope-label">Tap to open</div>
+    </div>
+
+    <div id="letter-card">
+
+      <div class="letter-paper">
+        <h2>HAPPY BIRTHDAY, SUNSHINE!</h2>
+        <p>
+          Many many happy returns of the day<br>
+          Enjoy your day to the fullest<br>
+          I love you a lot<br>
+          Always and forever
+        </p>
+      </div>
+
+      <div class="music-card">
+        <div class="music-header">
+          <div class="music-cover">♫</div>
+          <div class="music-title">Ishq Wala Love &lt;3</div>
+        </div>
+        <button id="play-snippet">Replay ✨</button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<button id="close-btn">Tap to Close</button>
+
+<script>
+/* ---------- ELEMENTS ---------- */
+const intro=document.getElementById("intro");
+const scene=document.getElementById("scene");
+const hearts=document.getElementById("hearts");
+const fifth=document.getElementById("fifth");
+const arrow=document.getElementById("arrow");
+const clickCircle=document.getElementById("click-circle");
+const bgmusic=document.getElementById("bgmusic");
+const snippetAudio=document.getElementById("snippetAudio");
+const fadeout=document.getElementById("fadeout");
+const t1=document.getElementById("t1");
+const t2=document.getElementById("t2");
+const envelopeEl=document.getElementById("envelope");
+const letterCard=document.getElementById("letter-card");
+const closeBtn=document.getElementById("close-btn");
+const videoSection=document.getElementById("video-section");
+const videoEl=document.getElementById("birthday-video");
+const replayBtn=document.getElementById("play-snippet");
+
+/* ---------- START ---------- */
+intro.onclick=()=>{
+  intro.style.opacity=0;
+  setTimeout(()=>intro.remove(),600);
+  bgmusic.play().catch(()=>{});
+  startTimeline();
+};
+
+/* ---------- HEARTS ---------- */
+function spawnHearts(){
+  let t=0;
+  const loop=setInterval(()=>{
+    t+=300;
+    if(t>20000){clearInterval(loop);return;}
+    const h=document.createElement("div");
+    h.className=Math.random()<.4?"heart-outline":"heart-fill";
+    h.textContent=h.className==="heart-outline"?"♡":"❤";
+    h.style.left=Math.random()*90+"%";
+    h.style.bottom="-20px";
+    hearts.appendChild(h);
+    setTimeout(()=>h.remove(),7000);
+  },320);
+}
+
+function spawnBigHearts(){
+  let t=0;
+  const loop=setInterval(()=>{
+    t+=2000;
+    if(t>20000){clearInterval(loop);return;}
+    const b=document.createElement("div");
+    b.className="big-heart";
+    b.textContent="♡";
+    b.style.left=(40+Math.random()*20)+"%";
+    b.style.top =(35+Math.random()*20)+"%";
+    hearts.appendChild(b);
+    setTimeout(()=>b.remove(),5000);
+  },4000);
+}
+
+/* ---------- CLICK SOUND ---------- */
+function clickSound(){
+  const ctx=new(window.AudioContext||window.webkitAudioContext)();
+  const osc=ctx.createOscillator();
+  const gain=ctx.createGain();
+  osc.type="triangle";
+  osc.frequency.value=650;
+  gain.gain.value=0.25;
+  osc.connect(gain);gain.connect(ctx.destination);
+  gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.08);
+  osc.start();osc.stop(ctx.currentTime+0.08);
+}
+
+/* ---------- VIDEO ---------- */
+function startVideo(){
+  bgmusic.pause();
+  bgmusic.currentTime=0;
+  scene.style.transform="translateY(-100vh)";
+  setTimeout(()=>videoSection.style.opacity=1,300);
+  setTimeout(()=>{
+    videoEl.style.opacity=1;
+    videoEl.play().catch(()=>{});
+  },700);
+  videoEl.addEventListener("ended",handleVideoEnd,{once:true});
+}
+
+function handleVideoEnd(){
+  const after=document.getElementById("after-video");
+  after.style.opacity=1;
+  after.style.pointerEvents="auto";
+  setTimeout(()=>envelopeEl.classList.add("show"),300);
+  try{bgmusic.currentTime=51;}catch(e){}
+  bgmusic.volume=.25;bgmusic.play().catch(()=>{});
+}
+
+/* ---------- ENVELOPE OPEN ---------- */
+envelopeEl.addEventListener("click",()=>{
+  if(envelopeEl.classList.contains("opened")) return;
+  envelopeEl.classList.add("opened");
+
+  const fade=setInterval(()=>{
+    if(bgmusic.volume>0.03){bgmusic.volume-=0.03;}
+    else{bgmusic.volume=0;bgmusic.pause();clearInterval(fade);}
+  },120);
+
+  setTimeout(()=>{
+    letterCard.style.opacity=1;
+    letterCard.style.transform="translateY(0) scale(1.2)";
+    closeBtn.classList.add("show");
+  },600);
+
+  snippetAudio.currentTime=180;
+  snippetAudio.volume=1;
+  snippetAudio.play().catch(()=>{});
+  function stopAtEnd(){
+    if(snippetAudio.currentTime>=210){
+      snippetAudio.pause();
+      snippetAudio.removeEventListener("timeupdate",stopAtEnd);
+    }
+  }
+  snippetAudio.addEventListener("timeupdate",stopAtEnd);
+});
+
+/* ---------- REPLAY ---------- */
+replayBtn.onclick=()=>{
+  snippetAudio.currentTime=180;
+  snippetAudio.play().catch(()=>{});
+  function stopAgain(){
+    if(snippetAudio.currentTime>=210){
+      snippetAudio.pause();
+      snippetAudio.removeEventListener("timeupdate",stopAgain);
+    }
+  }
+  snippetAudio.addEventListener("timeupdate",stopAgain);
+};
+
+/* ---------- CLOSE PAGE ---------- */
+closeBtn.onclick=()=>{
+  fadeout.style.opacity=1;
+  setTimeout(()=>window.close(),1200);
+};
+
+/* ---------- TIMELINE ---------- */
+function startTimeline(){
+
+  setTimeout(spawnHearts,800);
+  setTimeout(spawnBigHearts,1500);
+
+  setTimeout(()=>{
+    const rect=fifth.getBoundingClientRect();
+    arrow.style.left=(rect.left-35)+"px";
+    arrow.style.top =(rect.top+rect.height/2-12)+"px";
+    arrow.style.opacity=1;
+  },4700);
+
+  setTimeout(()=>{
+    const rect=fifth.getBoundingClientRect();
+    clickCircle.style.left=(rect.left+rect.width/2-13)+"px";
+    clickCircle.style.top =(rect.top+rect.height/2-13)+"px";
+    clickCircle.style.opacity=1;
+
+    clickCircle.style.transform="scale(1.3)";
+    setTimeout(()=>clickCircle.style.transform="scale(1)",300);
+
+    clickSound();
+    setTimeout(()=>clickCircle.style.opacity=0,500);
+    arrow.style.opacity=0;
+  },5400);
+
+  let msg="Happy birthdayyy to my man <3";
+  let i=0;
+
+  setTimeout(()=>{
+    function type(){
+      if(i<msg.length){
+        t1.style.opacity=1;
+        t1.textContent+=msg[i];
+        i++;
+        setTimeout(type,80);
+      } else {
+        setTimeout(()=>{t2.style.opacity=1;},300);
+      }
+    }
+    type();
+  },10500);
+
+  setTimeout(startVideo,14000);
+}
+</script>
+
+</body>
+</html>
